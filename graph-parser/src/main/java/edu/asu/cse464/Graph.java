@@ -91,4 +91,34 @@ public class Graph {
 
         return sb.toString();
     }
+    public void writePng(String outPath) throws Exception {
+        if (outPath == null || outPath.isBlank()) {
+            throw new IllegalArgumentException("Output path is empty");
+        }
+
+        String dot = toDotString();
+
+        ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", "-o", outPath);
+        pb.redirectErrorStream(true);
+
+        Process p = pb.start();
+
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(
+                new java.io.OutputStreamWriter(p.getOutputStream()))) {
+            w.write(dot);
+            w.flush();
+        }
+
+        String output;
+        try (java.io.InputStream is = p.getInputStream()) {
+            output = new String(is.readAllBytes());
+        }
+
+        int code = p.waitFor();
+        if (code != 0) {
+            throw new RuntimeException("Graphviz dot failed (exit " + code + "):\n" + output);
+        }
+    }
+
 }
+

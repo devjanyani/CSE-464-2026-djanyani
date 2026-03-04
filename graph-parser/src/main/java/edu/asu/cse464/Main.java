@@ -8,7 +8,9 @@ public class Main {
 
         System.out.println(graph);
 
-        System.out.println("\nDOT OUTPUT:");
-        System.out.println(graph.toDotString());
+        String outFile = "output.png";
+        graph.writePng(outFile);
+
+        System.out.println("Wrote PNG to: " + outFile);
     }
 }

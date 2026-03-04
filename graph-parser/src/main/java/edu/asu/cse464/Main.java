@@ -7,5 +7,8 @@ public class Main {
         Graph graph = DotParser.parseGraph("input/sample.dot");
 
         System.out.println(graph);
+
+        System.out.println("\nDOT OUTPUT:");
+        System.out.println(graph.toDotString());
     }
 }

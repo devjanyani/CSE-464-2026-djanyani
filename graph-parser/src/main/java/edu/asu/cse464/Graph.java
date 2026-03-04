@@ -68,4 +68,27 @@ public class Graph {
         for (String edge : getEdges()) sb.append(edge).append("\n");
         return sb.toString();
     }
+
+    public String toDotString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("digraph {\n");
+
+        for (String node : adj.keySet()) {
+            if (adj.get(node).isEmpty()) {
+                sb.append("  ").append(node).append(";\n");
+            } else {
+                for (String dst : adj.get(node)) {
+                    sb.append("  ").append(node)
+                            .append(" -> ")
+                            .append(dst)
+                            .append(";\n");
+                }
+            }
+        }
+
+        sb.append("}");
+
+        return sb.toString();
+    }
 }

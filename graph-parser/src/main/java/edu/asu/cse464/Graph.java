@@ -1,122 +1,154 @@
 package edu.asu.cse464;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class Graph {
-    private final Map<String, Set<String>> adj = new LinkedHashMap<>();
+
+    private final Set<String> nodes;
+    private final Map<String, List<String>> adjacency;
+
+    public Graph() {
+        nodes = new HashSet<>();
+        adjacency = new HashMap<>();
+    }
 
     public void addNode(String label) {
         if (label == null) return;
-        String v = label.trim();
-        if (v.isEmpty()) return;
-        adj.putIfAbsent(v, new LinkedHashSet<>());
+        String n = label.trim();
+        if (n.isEmpty()) return;
+
+        nodes.add(n);
+        adjacency.putIfAbsent(n, new ArrayList<>());
     }
 
-    public void addNodes(String[] labels) {
-        if (labels == null) return;
-        for (String s : labels) addNode(s);
-    }
-
-    public void addEdge(String srcLabel, String dstLabel) {
-        if (srcLabel == null || dstLabel == null) return;
-        String src = srcLabel.trim();
-        String dst = dstLabel.trim();
-        if (src.isEmpty() || dst.isEmpty()) return;
-
+    public void addEdge(String src, String dst) {
         addNode(src);
         addNode(dst);
-        adj.get(src).add(dst);
+        adjacency.get(src.trim()).add(dst.trim());
     }
 
     public int getNodeCount() {
-        return adj.size();
-    }
-
-    public List<String> getNodes() {
-        return new ArrayList<>(adj.keySet());
+        return nodes.size();
     }
 
     public int getEdgeCount() {
-        int c = 0;
-        for (Set<String> outs : adj.values()) c += outs.size();
-        return c;
+        int count = 0;
+        for (String src : adjacency.keySet()) {
+            count += adjacency.get(src).size();
+        }
+        return count;
     }
 
+    public Set<String> getNodes() {
+        return new HashSet<>(nodes);
+    }
+
+    // Returns edges as strings "a -> b" (matches your earlier output)
     public List<String> getEdges() {
         List<String> out = new ArrayList<>();
-        for (Map.Entry<String, Set<String>> e : adj.entrySet()) {
-            for (String dst : e.getValue()) out.add(e.getKey() + " -> " + dst);
+        List<String> srcs = new ArrayList<>(adjacency.keySet());
+        Collections.sort(srcs);
+
+        for (String src : srcs) {
+            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
+            Collections.sort(dsts);
+            for (String dst : dsts) {
+                out.add(src + " -> " + dst);
+            }
         }
         return out;
-    }
-
-    public Map<String, Set<String>> getAdjacency() {
-        Map<String, Set<String>> copy = new LinkedHashMap<>();
-        for (Map.Entry<String, Set<String>> e : adj.entrySet()) {
-            copy.put(e.getKey(), new LinkedHashSet<>(e.getValue()));
-        }
-        return copy;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+
+        List<String> sortedNodes = new ArrayList<>(nodes);
+        Collections.sort(sortedNodes);
+
         sb.append("Number of nodes: ").append(getNodeCount()).append("\n");
-        sb.append("Nodes: ").append(getNodes()).append("\n");
+        sb.append("Nodes: ").append(sortedNodes).append("\n");
         sb.append("Number of edges: ").append(getEdgeCount()).append("\n");
         sb.append("Edges:\n");
-        for (String edge : getEdges()) sb.append(edge).append("\n");
+
+        for (String e : getEdges()) {
+            sb.append(e).append("\n");
+        }
+
         return sb.toString();
     }
 
-    public String toDotString() {
+    // Builds DOT text internally (private)
+    private String buildDotString() {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph {\n");
 
-        for (String node : adj.keySet()) {
-            if (adj.get(node).isEmpty()) {
-                sb.append("  ").append(node).append(";\n");
-            } else {
-                for (String dst : adj.get(node)) {
-                    sb.append("  ").append(node)
-                            .append(" -> ")
-                            .append(dst)
-                            .append(";\n");
-                }
+        // Write isolated nodes too
+        List<String> sortedNodes = new ArrayList<>(nodes);
+        Collections.sort(sortedNodes);
+        for (String n : sortedNodes) {
+            sb.append("  ").append(n).append(";\n");
+        }
+
+        // Write edges
+        List<String> srcs = new ArrayList<>(adjacency.keySet());
+        Collections.sort(srcs);
+
+        for (String src : srcs) {
+            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
+            Collections.sort(dsts);
+            for (String dst : dsts) {
+                sb.append("  ").append(src).append(" -> ").append(dst).append(";\n");
             }
         }
 
-        sb.append("}");
-
+        sb.append("}\n");
         return sb.toString();
     }
-    public void writePng(String outPath) throws Exception {
-        if (outPath == null || outPath.isBlank()) {
-            throw new IllegalArgumentException("Output path is empty");
-        }
 
-        String dot = toDotString();
-
-        ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", "-o", outPath);
-        pb.redirectErrorStream(true);
-        Process p = pb.start();
-
-        try (java.io.BufferedWriter w = new java.io.BufferedWriter(
-                new java.io.OutputStreamWriter(p.getOutputStream()))) {
-            w.write(dot);
-            w.flush();
-        }
-
-        String output;
-        try (java.io.InputStream is = p.getInputStream()) {
-            output = new String(is.readAllBytes());
-        }
-
-        int code = p.waitFor();
-        if (code != 0) {
-            throw new RuntimeException("Graphviz dot failed (exit " + code + "):\n" + output);
-        }
+    // (1) NEW API: write DOT output to file
+    public void outputDOTGraph(String path) throws IOException {
+        Files.writeString(Path.of(path), buildDotString());
     }
 
-}
+    // (3) NEW API: write toString() to file
+    public void outputGraph(String filepath) throws IOException {
+        Files.writeString(Path.of(filepath), this.toString());
+    }
 
+    // (2) NEW API: output graphics with format (png only for now)
+    public void outputGraphics(String path, String format) throws Exception {
+        if (format == null) throw new IllegalArgumentException("format cannot be null");
+        String fmt = format.trim().toLowerCase(Locale.ROOT);
+
+        if (!fmt.equals("png")) {
+            throw new IllegalArgumentException("Only png is supported right now");
+        }
+
+        Path dotTmp = Files.createTempFile("graph-", ".dot");
+        try {
+            outputDOTGraph(dotTmp.toString());
+
+            ProcessBuilder pb = new ProcessBuilder(
+                    "dot",
+                    "-T" + fmt,
+                    dotTmp.toString(),
+                    "-o",
+                    path
+            );
+            pb.redirectErrorStream(true);
+
+            Process p = pb.start();
+            int code = p.waitFor();
+
+            if (code != 0) {
+                throw new RuntimeException("Graphviz dot failed with exit code " + code);
+            }
+        } finally {
+            Files.deleteIfExists(dotTmp);
+        }
+    }
+}

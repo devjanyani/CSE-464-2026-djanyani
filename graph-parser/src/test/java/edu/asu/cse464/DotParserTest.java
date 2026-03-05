@@ -7,7 +7,6 @@ public class DotParserTest {
 
     @Test
     public void testParseGraph() throws Exception {
-
         Graph g = DotParser.parseGraph("input/sample.dot");
 
         assertEquals(8, g.getNodeCount());

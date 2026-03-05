@@ -71,7 +71,6 @@ public class Graph {
 
     public String toDotString() {
         StringBuilder sb = new StringBuilder();
-
         sb.append("digraph {\n");
 
         for (String node : adj.keySet()) {
@@ -100,7 +99,6 @@ public class Graph {
 
         ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", "-o", outPath);
         pb.redirectErrorStream(true);
-
         Process p = pb.start();
 
         try (java.io.BufferedWriter w = new java.io.BufferedWriter(

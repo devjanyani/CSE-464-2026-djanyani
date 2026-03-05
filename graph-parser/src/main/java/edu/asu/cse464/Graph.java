@@ -24,6 +24,14 @@ public class Graph {
         adjacency.putIfAbsent(n, new ArrayList<>());
     }
 
+    public void addNodes(String[] labels) {
+        if (labels == null) return;
+
+        for (String label : labels) {
+            addNode(label);
+        }
+    }
+
     public void addEdge(String src, String dst) {
         addNode(src);
         addNode(dst);
@@ -46,7 +54,6 @@ public class Graph {
         return new HashSet<>(nodes);
     }
 
-    // Returns edges as strings "a -> b" (matches your earlier output)
     public List<String> getEdges() {
         List<String> out = new ArrayList<>();
         List<String> srcs = new ArrayList<>(adjacency.keySet());
@@ -81,19 +88,16 @@ public class Graph {
         return sb.toString();
     }
 
-    // Builds DOT text internally (private)
     private String buildDotString() {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph {\n");
 
-        // Write isolated nodes too
         List<String> sortedNodes = new ArrayList<>(nodes);
         Collections.sort(sortedNodes);
         for (String n : sortedNodes) {
             sb.append("  ").append(n).append(";\n");
         }
 
-        // Write edges
         List<String> srcs = new ArrayList<>(adjacency.keySet());
         Collections.sort(srcs);
 
@@ -109,17 +113,14 @@ public class Graph {
         return sb.toString();
     }
 
-    // (1) NEW API: write DOT output to file
     public void outputDOTGraph(String path) throws IOException {
         Files.writeString(Path.of(path), buildDotString());
     }
 
-    // (3) NEW API: write toString() to file
     public void outputGraph(String filepath) throws IOException {
         Files.writeString(Path.of(filepath), this.toString());
     }
 
-    // (2) NEW API: output graphics with format (png only for now)
     public void outputGraphics(String path, String format) throws Exception {
         if (format == null) throw new IllegalArgumentException("format cannot be null");
         String fmt = format.trim().toLowerCase(Locale.ROOT);

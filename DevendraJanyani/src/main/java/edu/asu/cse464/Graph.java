@@ -35,11 +35,7 @@ public class Graph {
     public void addEdge(String src, String dst) {
         addNode(src);
         addNode(dst);
-        String s = src.trim();
-        String d = dst.trim();
-        if (!adjacency.get(s).contains(d)) {
-            adjacency.get(s).add(d);
-        }
+        adjacency.get(src.trim()).add(dst.trim());
     }
 
     public int getNodeCount() {

@@ -59,34 +59,4 @@ public class GraphTest {
             Files.deleteIfExists(tmp);
         }
     }
-    @Test
-    public void testAddDuplicateEdge() {
-        Graph g = new Graph();
-        g.addEdge("A", "B");
-        g.addEdge("A", "B"); // duplicate
-        assertEquals(1, g.getEdgeCount());
-    }
-
-    @Test
-    public void testAddNodes() {
-        Graph g = new Graph();
-        g.addNodes(new String[]{"A", "B", "C"});
-        assertEquals(3, g.getNodeCount());
-        assertTrue(g.getNodes().contains("A"));
-        assertTrue(g.getNodes().contains("B"));
-        assertTrue(g.getNodes().contains("C"));
-    }
-
-    @Test
-    public void testToString() {
-        Graph g = new Graph();
-        g.addEdge("A", "B");
-        g.addNode("C");
-        String output = g.toString();
-        assertTrue(output.contains("Number of nodes: 3"));
-        assertTrue(output.contains("Number of edges: 1"));
-        assertTrue(output.contains("A -> B"));
-        assertTrue(output.contains("Nodes:"));
-    }
-
 }

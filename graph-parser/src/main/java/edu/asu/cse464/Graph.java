@@ -2,7 +2,8 @@ package edu.asu.cse464;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Queue;
+import java.util.LinkedList;
 import java.util.*;
 
 public class Graph {
@@ -118,11 +119,11 @@ public class Graph {
     }
 
     public void outputDOTGraph(String path) throws IOException {
-        Files.writeString(Path.of(path), buildDotString());
+        Files.writeString(java.nio.file.Path.of(path), buildDotString());
     }
 
     public void outputGraph(String filepath) throws IOException {
-        Files.writeString(Path.of(filepath), this.toString());
+        Files.writeString(java.nio.file.Path.of(filepath), this.toString());
     }
 
     public void outputGraphics(String path, String format) throws Exception {
@@ -133,7 +134,7 @@ public class Graph {
             throw new IllegalArgumentException("Only png is supported right now");
         }
 
-        Path dotTmp = Files.createTempFile("graph-", ".dot");
+        java.nio.file.Path dotTmp = Files.createTempFile("graph-", ".dot");
         try {
             outputDOTGraph(dotTmp.toString());
 
@@ -191,4 +192,46 @@ public class Graph {
         }
         neighbors.remove(d);
     }
+    public Path GraphSearch(String src, String dst) {
+        if (!nodes.contains(src) || !nodes.contains(dst)) {
+            return null;
+        }
+
+        // BFS
+        Queue<String> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        Map<String, String> parent = new HashMap<>();
+
+        queue.add(src);
+        visited.add(src);
+        parent.put(src, null);
+
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+
+            if (current.equals(dst)) {
+                // Build path by backtracking
+                List<String> pathNodes = new ArrayList<>();
+                String node = dst;
+                while (node != null) {
+                    pathNodes.add(node);
+                    node = parent.get(node);
+                }
+                Collections.reverse(pathNodes);
+                return new Path(pathNodes);
+            }
+
+            List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
+            for (String neighbor : neighbors) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    parent.put(neighbor, current);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return null; // no path found
+    }
+
 }

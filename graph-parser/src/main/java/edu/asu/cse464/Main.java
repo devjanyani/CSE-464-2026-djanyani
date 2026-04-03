@@ -1,27 +1,20 @@
 package edu.asu.cse464;
-
+import edu.asu.cse464.Path;
 public class Main {
 
     public static void main(String[] args) throws Exception {
         String inputDot = "input/sample.dot";
 
         Graph g = DotParser.parseGraph(inputDot);
-
         System.out.println("=== Parsed Graph ===");
         System.out.print(g.toString());
 
-        System.out.println("\n=== After removing node 'a' ===");
-        g.removeNode("a");
-        System.out.print(g.toString());
+        System.out.println("\n=== BFS: Path from 'a' to 'h' ===");
+        Path path = g.GraphSearch("a", "h");
+        System.out.println(path != null ? path.toString() : "No path found");
 
-        System.out.println("\n=== After removing edge 'e' -> 'f' ===");
-        g.removeEdge("e", "f");
-        System.out.print(g.toString());
-
-        g.outputDOTGraph("output.dot");
-        g.outputGraphics("output.png", "png");
-
-        System.out.println("\nWrote DOT to: output.dot");
-        System.out.println("Wrote PNG to: output.png");
+        System.out.println("\n=== BFS: Path from 'h' to 'a' ===");
+        Path path2 = g.GraphSearch("h", "a");
+        System.out.println(path2 != null ? path2.toString() : "No path found");
     }
 }

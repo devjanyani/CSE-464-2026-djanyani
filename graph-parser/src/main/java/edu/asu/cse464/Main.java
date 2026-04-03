@@ -1,5 +1,5 @@
 package edu.asu.cse464;
-import edu.asu.cse464.Path;
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
@@ -10,11 +10,15 @@ public class Main {
         System.out.print(g.toString());
 
         System.out.println("\n=== BFS: Path from 'a' to 'h' ===");
-        Path path = g.GraphSearch("a", "h");
-        System.out.println(path != null ? path.toString() : "No path found");
+        Path bfsPath = g.GraphSearch("a", "h", Algorithm.BFS);
+        System.out.println(bfsPath != null ? bfsPath.toString() : "No path found");
+
+        System.out.println("\n=== DFS: Path from 'a' to 'h' ===");
+        Path dfsPath = g.GraphSearch("a", "h", Algorithm.DFS);
+        System.out.println(dfsPath != null ? dfsPath.toString() : "No path found");
 
         System.out.println("\n=== BFS: Path from 'h' to 'a' ===");
-        Path path2 = g.GraphSearch("h", "a");
-        System.out.println(path2 != null ? path2.toString() : "No path found");
+        Path noPath = g.GraphSearch("h", "a", Algorithm.BFS);
+        System.out.println(noPath != null ? noPath.toString() : "No path found");
     }
 }

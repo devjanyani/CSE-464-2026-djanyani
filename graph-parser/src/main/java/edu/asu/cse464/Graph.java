@@ -1,5 +1,5 @@
 package edu.asu.cse464;
-
+import java.util.Stack;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Queue;
@@ -192,12 +192,20 @@ public class Graph {
         }
         neighbors.remove(d);
     }
-    public Path GraphSearch(String src, String dst) {
+
+    public Path GraphSearch(String src, String dst, Algorithm algo) {
         if (!nodes.contains(src) || !nodes.contains(dst)) {
             return null;
         }
 
-        // BFS
+        if (algo == Algorithm.BFS) {
+            return bfsSearch(src, dst);
+        } else {
+            return dfsSearch(src, dst);
+        }
+    }
+
+    private Path bfsSearch(String src, String dst) {
         Queue<String> queue = new LinkedList<>();
         Set<String> visited = new HashSet<>();
         Map<String, String> parent = new HashMap<>();
@@ -210,15 +218,7 @@ public class Graph {
             String current = queue.poll();
 
             if (current.equals(dst)) {
-                // Build path by backtracking
-                List<String> pathNodes = new ArrayList<>();
-                String node = dst;
-                while (node != null) {
-                    pathNodes.add(node);
-                    node = parent.get(node);
-                }
-                Collections.reverse(pathNodes);
-                return new Path(pathNodes);
+                return buildPath(parent, dst);
             }
 
             List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
@@ -230,8 +230,48 @@ public class Graph {
                 }
             }
         }
-
-        return null; // no path found
+        return null;
     }
 
+    private Path dfsSearch(String src, String dst) {
+        Stack<String> stack = new Stack<>();
+        Set<String> visited = new HashSet<>();
+        Map<String, String> parent = new HashMap<>();
+
+        stack.push(src);
+        parent.put(src, null);
+
+        while (!stack.isEmpty()) {
+            String current = stack.pop();
+
+            if (visited.contains(current)) {
+                continue;
+            }
+            visited.add(current);
+
+            if (current.equals(dst)) {
+                return buildPath(parent, dst);
+            }
+
+            List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
+            for (String neighbor : neighbors) {
+                if (!visited.contains(neighbor)) {
+                    parent.put(neighbor, current);
+                    stack.push(neighbor);
+                }
+            }
+        }
+        return null;
+    }
+
+    private Path buildPath(Map<String, String> parent, String dst) {
+        List<String> pathNodes = new ArrayList<>();
+        String node = dst;
+        while (node != null) {
+            pathNodes.add(node);
+            node = parent.get(node);
+        }
+        Collections.reverse(pathNodes);
+        return new Path(pathNodes);
+    }
 }

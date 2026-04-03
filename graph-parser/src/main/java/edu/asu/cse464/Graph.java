@@ -156,4 +156,39 @@ public class Graph {
             Files.deleteIfExists(dotTmp);
         }
     }
+
+    public void removeNode(String label) {
+        if (label == null || !nodes.contains(label.trim())) {
+            throw new IllegalArgumentException("Node '" + label + "' does not exist in the graph");
+        }
+        String n = label.trim();
+        nodes.remove(n);
+        adjacency.remove(n);
+        for (List<String> neighbors : adjacency.values()) {
+            neighbors.remove(n);
+        }
+    }
+
+    public void removeNodes(String[] labels) {
+        if (labels == null) throw new IllegalArgumentException("Labels array cannot be null");
+        for (String label : labels) {
+            removeNode(label);
+        }
+    }
+
+    public void removeEdge(String srcLabel, String dstLabel) {
+        if (srcLabel == null || !nodes.contains(srcLabel.trim())) {
+            throw new IllegalArgumentException("Source node '" + srcLabel + "' does not exist in the graph");
+        }
+        if (dstLabel == null || !nodes.contains(dstLabel.trim())) {
+            throw new IllegalArgumentException("Destination node '" + dstLabel + "' does not exist in the graph");
+        }
+        String s = srcLabel.trim();
+        String d = dstLabel.trim();
+        List<String> neighbors = adjacency.get(s);
+        if (!neighbors.contains(d)) {
+            throw new IllegalArgumentException("Edge '" + s + " -> " + d + "' does not exist in the graph");
+        }
+        neighbors.remove(d);
+    }
 }

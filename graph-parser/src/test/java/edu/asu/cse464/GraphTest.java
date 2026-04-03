@@ -89,4 +89,70 @@ public class GraphTest {
         assertTrue(output.contains("Nodes:"));
     }
 
+    @Test
+    public void testRemoveNode() {
+        Graph g = new Graph();
+        g.addEdge("A", "B");
+        g.addEdge("A", "C");
+        g.addEdge("B", "C");
+        g.removeNode("A");
+        assertEquals(2, g.getNodeCount());
+        assertFalse(g.getNodes().contains("A"));
+        assertEquals(1, g.getEdgeCount());
+    }
+
+    @Test
+    public void testRemoveNodes() {
+        Graph g = new Graph();
+        g.addEdge("A", "B");
+        g.addEdge("B", "C");
+        g.addEdge("C", "D");
+        g.removeNodes(new String[]{"A", "B"});
+        assertEquals(2, g.getNodeCount());
+        assertTrue(g.getNodes().contains("C"));
+        assertTrue(g.getNodes().contains("D"));
+        assertEquals(1, g.getEdgeCount());
+    }
+
+    @Test
+    public void testRemoveEdge() {
+        Graph g = new Graph();
+        g.addEdge("A", "B");
+        g.addEdge("A", "C");
+        g.removeEdge("A", "B");
+        assertEquals(3, g.getNodeCount());
+        assertEquals(1, g.getEdgeCount());
+        assertFalse(g.getEdges().contains("A -> B"));
+        assertTrue(g.getEdges().contains("A -> C"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveNodeNotExists() {
+        Graph g = new Graph();
+        g.addNode("A");
+        g.removeNode("Z");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveNodesOneNotExists() {
+        Graph g = new Graph();
+        g.addNode("A");
+        g.addNode("B");
+        g.removeNodes(new String[]{"A", "Z"});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveEdgeNotExists() {
+        Graph g = new Graph();
+        g.addEdge("A", "B");
+        g.removeEdge("A", "C");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveEdgeSrcNotExists() {
+        Graph g = new Graph();
+        g.addEdge("A", "B");
+        g.removeEdge("Z", "B");
+    }
+
 }

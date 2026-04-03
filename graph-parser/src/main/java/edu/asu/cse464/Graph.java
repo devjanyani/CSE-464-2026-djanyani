@@ -1,8 +1,7 @@
 package edu.asu.cse464;
-
+import java.util.Stack;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 public class Graph {
@@ -118,11 +117,11 @@ public class Graph {
     }
 
     public void outputDOTGraph(String path) throws IOException {
-        Files.writeString(Path.of(path), buildDotString());
+        Files.writeString(java.nio.file.Path.of(path), buildDotString());
     }
 
     public void outputGraph(String filepath) throws IOException {
-        Files.writeString(Path.of(filepath), this.toString());
+        Files.writeString(java.nio.file.Path.of(filepath), this.toString());
     }
 
     public void outputGraphics(String path, String format) throws Exception {
@@ -133,7 +132,7 @@ public class Graph {
             throw new IllegalArgumentException("Only png is supported right now");
         }
 
-        Path dotTmp = Files.createTempFile("graph-", ".dot");
+        java.nio.file.Path dotTmp = Files.createTempFile("graph-", ".dot");
         try {
             outputDOTGraph(dotTmp.toString());
 
@@ -191,4 +190,48 @@ public class Graph {
         }
         neighbors.remove(d);
     }
+    public Path GraphSearch(String src, String dst) {
+        if (!nodes.contains(src) || !nodes.contains(dst)) {
+            return null;
+        }
+
+        // DFS
+        Stack<String> stack = new Stack<>();
+        Set<String> visited = new HashSet<>();
+        Map<String, String> parent = new HashMap<>();
+
+        stack.push(src);
+        parent.put(src, null);
+
+        while (!stack.isEmpty()) {
+            String current = stack.pop();
+
+            if (visited.contains(current)) {
+                continue;
+            }
+            visited.add(current);
+
+            if (current.equals(dst)) {
+                List<String> pathNodes = new ArrayList<>();
+                String node = dst;
+                while (node != null) {
+                    pathNodes.add(node);
+                    node = parent.get(node);
+                }
+                Collections.reverse(pathNodes);
+                return new Path(pathNodes);
+            }
+
+            List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
+            for (String neighbor : neighbors) {
+                if (!visited.contains(neighbor)) {
+                    parent.put(neighbor, current);
+                    stack.push(neighbor);
+                }
+            }
+        }
+
+        return null;
+    }
+
 }

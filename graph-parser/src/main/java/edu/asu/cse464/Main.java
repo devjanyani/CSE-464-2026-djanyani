@@ -17,8 +17,11 @@ public class Main {
         Path dfsPath = g.graphSearch("a", "h", Algorithm.DFS);
         System.out.println(dfsPath != null ? dfsPath.toString() : "No path found");
 
-        System.out.println("\n=== BFS: Path from 'h' to 'a' ===");
-        Path noPath = g.graphSearch("h", "a", Algorithm.BFS);
-        System.out.println(noPath != null ? noPath.toString() : "No path found");
+        System.out.println("\n=== Random Walk Searches from 'a' to 'c' (5 runs) ===");
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("\nrandom testing " + i);
+            Path rPath = g.graphSearch("a", "c", Algorithm.RANDOM);
+            System.out.println(rPath != null ? rPath.toString() : "No path found");
+        }
     }
 }

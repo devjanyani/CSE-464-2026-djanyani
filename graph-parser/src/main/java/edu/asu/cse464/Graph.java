@@ -78,8 +78,7 @@ public class Graph {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        List<String> sortedNodes = new ArrayList<>(nodes);
-        Collections.sort(sortedNodes);
+        List<String> sortedNodes = getSortedNodes();
 
         sb.append("Number of nodes: ").append(getNodeCount()).append("\n");
         sb.append("Nodes: ").append(sortedNodes).append("\n");
@@ -97,8 +96,7 @@ public class Graph {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph {\n");
 
-        List<String> sortedNodes = new ArrayList<>(nodes);
-        Collections.sort(sortedNodes);
+        List<String> sortedNodes = getSortedNodes();
         for (String n : sortedNodes) {
             sb.append("  ").append(n).append(";\n");
         }
@@ -274,4 +272,11 @@ public class Graph {
         Collections.reverse(pathNodes);
         return new Path(pathNodes);
     }
+
+    private List<String> getSortedNodes() {
+        List<String> sorted = new ArrayList<>(nodes);
+        Collections.sort(sorted);
+        return sorted;
+    }
+
 }

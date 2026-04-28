@@ -201,7 +201,7 @@ public class Graph {
                 return buildPath(parent, dst);
             }
 
-            List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
+            List<String> neighbors = getNeighbors(current);
             for (String neighbor : neighbors) {
                 if (!visited.contains(neighbor)) {
                     visited.add(neighbor);
@@ -233,7 +233,7 @@ public class Graph {
                 return buildPath(parent, dst);
             }
 
-            List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
+            List<String> neighbors = getNeighbors(current);
             for (String neighbor : neighbors) {
                 if (!visited.contains(neighbor)) {
                     parent.put(neighbor, current);
@@ -274,4 +274,9 @@ public class Graph {
         }
         return pairs;
     }
+
+    public List<String> getNeighbors(String node) {
+        return adjacency.getOrDefault(node, new ArrayList<>());
+    }
+
 }

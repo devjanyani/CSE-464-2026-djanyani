@@ -57,15 +57,8 @@ public class Graph {
 
     public List<String> getEdges() {
         List<String> out = new ArrayList<>();
-        List<String> srcs = new ArrayList<>(adjacency.keySet());
-        Collections.sort(srcs);
-
-        for (String src : srcs) {
-            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
-            Collections.sort(dsts);
-            for (String dst : dsts) {
-                out.add(src + " -> " + dst);
-            }
+        for (String[] pair : getSortedEdgePairs()) {
+            out.add(pair[0] + " -> " + pair[1]);
         }
         return out;
     }
@@ -97,15 +90,8 @@ public class Graph {
             sb.append("  ").append(n).append(";\n");
         }
 
-        List<String> srcs = new ArrayList<>(adjacency.keySet());
-        Collections.sort(srcs);
-
-        for (String src : srcs) {
-            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
-            Collections.sort(dsts);
-            for (String dst : dsts) {
-                sb.append("  ").append(src).append(" -> ").append(dst).append(";\n");
-            }
+        for (String[] pair : getSortedEdgePairs()) {
+            sb.append("  ").append(pair[0]).append(" -> ").append(pair[1]).append(";\n");
         }
 
         sb.append("}\n");
@@ -275,4 +261,17 @@ public class Graph {
         return sorted;
     }
 
+    private List<String[]> getSortedEdgePairs() {
+        List<String[]> pairs = new ArrayList<>();
+        List<String> srcs = new ArrayList<>(adjacency.keySet());
+        Collections.sort(srcs);
+        for (String src : srcs) {
+            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
+            Collections.sort(dsts);
+            for (String dst : dsts) {
+                pairs.add(new String[]{src, dst});
+            }
+        }
+        return pairs;
+    }
 }

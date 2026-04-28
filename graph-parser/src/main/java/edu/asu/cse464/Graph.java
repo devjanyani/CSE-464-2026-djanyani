@@ -174,12 +174,7 @@ public class Graph {
     }
 
     public Path graphSearch(String src, String dst, Algorithm algo) {
-        GraphSearchStrategy strategy;
-        if (algo == Algorithm.BFS) {
-            strategy = new BFSStrategy();
-        } else {
-            strategy = new DFSStrategy();
-        }
+        GraphSearchStrategy strategy = algo.getStrategy();
         return strategy.search(src, dst, this);
     }
 

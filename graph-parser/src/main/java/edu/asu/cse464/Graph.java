@@ -173,7 +173,7 @@ public class Graph {
         neighbors.remove(d);
     }
 
-    public Path GraphSearch(String src, String dst, Algorithm algo) {
+    public Path graphSearch(String src, String dst, Algorithm algo) {
         if (!nodes.contains(src) || !nodes.contains(dst)) {
             return null;
         }

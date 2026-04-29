@@ -1,11 +1,7 @@
 package edu.asu.cse464;
-import java.util.Stack;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Queue;
-import java.util.LinkedList;
 import java.util.*;
-
 public class Graph {
 
     private final Set<String> nodes;
@@ -61,15 +57,8 @@ public class Graph {
 
     public List<String> getEdges() {
         List<String> out = new ArrayList<>();
-        List<String> srcs = new ArrayList<>(adjacency.keySet());
-        Collections.sort(srcs);
-
-        for (String src : srcs) {
-            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
-            Collections.sort(dsts);
-            for (String dst : dsts) {
-                out.add(src + " -> " + dst);
-            }
+        for (String[] pair : getSortedEdgePairs()) {
+            out.add(pair[0] + " -> " + pair[1]);
         }
         return out;
     }
@@ -78,8 +67,7 @@ public class Graph {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        List<String> sortedNodes = new ArrayList<>(nodes);
-        Collections.sort(sortedNodes);
+        List<String> sortedNodes = getSortedNodes();
 
         sb.append("Number of nodes: ").append(getNodeCount()).append("\n");
         sb.append("Nodes: ").append(sortedNodes).append("\n");
@@ -97,21 +85,13 @@ public class Graph {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph {\n");
 
-        List<String> sortedNodes = new ArrayList<>(nodes);
-        Collections.sort(sortedNodes);
+        List<String> sortedNodes = getSortedNodes();
         for (String n : sortedNodes) {
             sb.append("  ").append(n).append(";\n");
         }
 
-        List<String> srcs = new ArrayList<>(adjacency.keySet());
-        Collections.sort(srcs);
-
-        for (String src : srcs) {
-            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
-            Collections.sort(dsts);
-            for (String dst : dsts) {
-                sb.append("  ").append(src).append(" -> ").append(dst).append(";\n");
-            }
+        for (String[] pair : getSortedEdgePairs()) {
+            sb.append("  ").append(pair[0]).append(" -> ").append(pair[1]).append(";\n");
         }
 
         sb.append("}\n");
@@ -193,85 +173,34 @@ public class Graph {
         neighbors.remove(d);
     }
 
-    public Path GraphSearch(String src, String dst, Algorithm algo) {
-        if (!nodes.contains(src) || !nodes.contains(dst)) {
-            return null;
-        }
-
-        if (algo == Algorithm.BFS) {
-            return bfsSearch(src, dst);
-        } else {
-            return dfsSearch(src, dst);
-        }
+    public Path graphSearch(String src, String dst, Algorithm algo) {
+        GraphSearchStrategy strategy = algo.getStrategy();
+        return strategy.search(src, dst, this);
     }
 
-    private Path bfsSearch(String src, String dst) {
-        Queue<String> queue = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        Map<String, String> parent = new HashMap<>();
 
-        queue.add(src);
-        visited.add(src);
-        parent.put(src, null);
-
-        while (!queue.isEmpty()) {
-            String current = queue.poll();
-
-            if (current.equals(dst)) {
-                return buildPath(parent, dst);
-            }
-
-            List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
-            for (String neighbor : neighbors) {
-                if (!visited.contains(neighbor)) {
-                    visited.add(neighbor);
-                    parent.put(neighbor, current);
-                    queue.add(neighbor);
-                }
-            }
-        }
-        return null;
+    private List<String> getSortedNodes() {
+        List<String> sorted = new ArrayList<>(nodes);
+        Collections.sort(sorted);
+        return sorted;
     }
 
-    private Path dfsSearch(String src, String dst) {
-        Stack<String> stack = new Stack<>();
-        Set<String> visited = new HashSet<>();
-        Map<String, String> parent = new HashMap<>();
-
-        stack.push(src);
-        parent.put(src, null);
-
-        while (!stack.isEmpty()) {
-            String current = stack.pop();
-
-            if (visited.contains(current)) {
-                continue;
-            }
-            visited.add(current);
-
-            if (current.equals(dst)) {
-                return buildPath(parent, dst);
-            }
-
-            List<String> neighbors = adjacency.getOrDefault(current, new ArrayList<>());
-            for (String neighbor : neighbors) {
-                if (!visited.contains(neighbor)) {
-                    parent.put(neighbor, current);
-                    stack.push(neighbor);
-                }
+    private List<String[]> getSortedEdgePairs() {
+        List<String[]> pairs = new ArrayList<>();
+        List<String> srcs = new ArrayList<>(adjacency.keySet());
+        Collections.sort(srcs);
+        for (String src : srcs) {
+            List<String> dsts = new ArrayList<>(adjacency.getOrDefault(src, List.of()));
+            Collections.sort(dsts);
+            for (String dst : dsts) {
+                pairs.add(new String[]{src, dst});
             }
         }
-        return null;
+        return pairs;
     }
 
-    private Path buildPath(Map<String, String> parent, String dst) {
-        List<String> pathNodes = new ArrayList<>();
-        String node = dst;
-        while (node != null) {
-            pathNodes.add(node);
-            node = parent.get(node);
-        }
-        Collections.reverse(pathNodes);
-        return new Path(pathNodes);
+    public List<String> getNeighbors(String node) {
+        return adjacency.getOrDefault(node, new ArrayList<>());
     }
+
 }

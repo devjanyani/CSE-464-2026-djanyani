@@ -20,7 +20,7 @@ public class Main {
         System.out.println("\n=== Random Walk Searches from 'a' to 'c' (5 runs) ===");
         for (int i = 1; i <= 5; i++) {
             System.out.println("\nrandom testing " + i);
-            Path rPath = g.graphSearch("a", "c", Algorithm.RANDOM);
+            Path rPath = g.graphSearch("a", "h", Algorithm.RANDOM);
             System.out.println(rPath != null ? rPath.toString() : "No path found");
         }
     }
